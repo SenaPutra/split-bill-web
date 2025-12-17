@@ -1,4 +1,4 @@
-# Split Bill AI 🧾✨
+# Split Bill 🧾✨
 
 A modern web application that simplifies dividing restaurant bills or shared expenses. 
 Upload a receipt photo, let the AI extract the items, and easily drag-and-drop to split costs with friends.
