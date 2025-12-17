@@ -34,8 +34,21 @@ function App() {
     setStep('processing');
   };
 
-  const handleItemsFound = (foundItems) => {
+  const handleItemsFound = (foundItems, foundTax = 0, foundService = 0) => {
     setItems(foundItems);
+
+    // Auto-calculate rates based on amounts found vs subtotal
+    const subtotal = foundItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+
+    if (subtotal > 0) {
+      if (foundTax > 0) {
+        setTaxRate(parseFloat(((foundTax / subtotal) * 100).toFixed(2)));
+      }
+      if (foundService > 0) {
+        setServiceRate(parseFloat(((foundService / subtotal) * 100).toFixed(2)));
+      }
+    }
+
     setStep('edit');
   };
 
