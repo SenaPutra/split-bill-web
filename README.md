@@ -8,8 +8,8 @@ Upload a receipt photo, let the AI extract the items, and easily drag-and-drop t
 
 ## 🚀 Features
 
--   **AI Receipt Scanning**: Uses **Tesseract.js** to run OCR directly in your browser. No data leaves your device privacy-first!
--   **Smart Parsing**: Automatically detects items and prices from raw receipt text.
+-   **AI Receipt Scanning**: Uses **OpenAI Vision** to extract receipt items, tax, and service amounts from uploaded receipt photos.
+-   **Smart Parsing**: Automatically structures item name, unit price, quantity, tax, and service.
 -   **Interactive Editor**: Fix any typos or scanning errors before you split.
 -   **Easy Splitting**:
     -   Create profiles for everyone at the table.
@@ -24,7 +24,7 @@ Upload a receipt photo, let the AI extract the items, and easily drag-and-drop t
 -   **Frontend**: React 18, Vite
 -   **Language**: JavaScript
 -   **Styling**: Vanilla CSS (Variables, Glassmorphism), Lucide React (Icons)
--   **AI/OCR**: Tesseract.js (Client-side WASM)
+-   **AI/OCR**: OpenAI Responses API (Vision)
 -   **Containerization**: Docker, Docker Compose, Nginx
 
 ## 🐳 How to Run
@@ -63,7 +63,7 @@ If you want to edit the code or run it without Docker:
 ├── src/
 │   ├── components/
 │   │   ├── ImageUploader.jsx    # Drag & drop input
-│   │   ├── ReceiptProcessor.jsx # Tesseract OCR logic
+│   │   ├── ReceiptProcessor.jsx # OpenAI Vision extraction logic
 │   │   ├── ItemEditor.jsx       # Edit parsed items
 │   │   ├── PersonSetup.jsx      # Add friends
 │   │   ├── Splitter.jsx         # Assign items
