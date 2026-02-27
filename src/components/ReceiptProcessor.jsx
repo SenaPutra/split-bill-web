@@ -91,7 +91,7 @@ JSON format:
 
         if (!response.ok) {
           const errText = await response.text();
-          throw new Error(`OpenAI error ${response.status}: ${errText}`);
+          throw new Error(`OCR API error ${response.status}: ${errText}`);
         }
 
         const payload = await response.json();
@@ -106,12 +106,12 @@ JSON format:
         const data = extractJson(text);
         const validItems = Array.isArray(data.items)
           ? data.items.map((item, index) => ({
-            id: `item-${Date.now()}-${index}`,
-            name: item.name || 'Unknown Item',
-            price: Number(item.price) || 0,
-            quantity: Math.max(1, Number(item.quantity) || 1),
-            originalLine: `${item.name || 'Unknown'} ${item.price || 0}`
-          }))
+              id: `item-${Date.now()}-${index}`,
+              name: item.name || 'Unknown Item',
+              price: Number(item.price) || 0,
+              quantity: Math.max(1, Number(item.quantity) || 1),
+              originalLine: `${item.name || 'Unknown'} ${item.price || 0}`
+            }))
           : [];
 
         onItemsFound(validItems, Number(data.tax) || 0, Number(data.service) || 0);
@@ -148,7 +148,7 @@ JSON format:
       <h2 style={{ marginBottom: '0.5rem' }}>Processing Receipt</h2>
       <p style={{ color: 'var(--text-secondary)' }}>{status}</p>
       <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginTop: '1rem' }}>
-        Using {OPENAI_MODEL} for OCR + item extraction
+        Using {OPENAI_MODEL} via backend proxy (API key is not exposed to browser)
       </p>
     </div>
   );
