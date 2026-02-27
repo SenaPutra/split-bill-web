@@ -39,13 +39,6 @@ export default function ReceiptProcessor({ image, onItemsFound }) {
     }
 
     const processImage = async () => {
-      const apiKey = import.meta.env.VITE_OPENAI_API_KEY;
-
-      if (!apiKey || apiKey === 'YOUR_OPENAI_API_KEY_HERE') {
-        setError('Missing OpenAI API key. Please add VITE_OPENAI_API_KEY to your .env file.');
-        return;
-      }
-
       setStatus('Sending receipt to OpenAI...');
 
       try {
@@ -68,11 +61,10 @@ JSON format:
   "service": 500
 }`;
 
-        const response = await fetch('https://api.openai.com/v1/responses', {
+        const response = await fetch('/api/receipt-ocr', {
           method: 'POST',
           headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${apiKey}`
+            'Content-Type': 'application/json'
           },
           body: JSON.stringify({
             model: OPENAI_MODEL,
@@ -91,6 +83,9 @@ JSON format:
 
         if (!response.ok) {
           const errText = await response.text();
+          if (response.status === 401) {
+            throw new Error('Unauthorized from OpenAI proxy. Check OPENAI_API_KEY in your environment.');
+          }
           throw new Error(`OCR API error ${response.status}: ${errText}`);
         }
 
