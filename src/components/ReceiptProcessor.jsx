@@ -39,7 +39,14 @@ export default function ReceiptProcessor({ image, onItemsFound }) {
     }
 
     const processImage = async () => {
-      setStatus('Sending receipt to secure OCR API...');
+      const apiKey = import.meta.env.VITE_OPENAI_API_KEY;
+
+      if (!apiKey || apiKey === 'YOUR_OPENAI_API_KEY_HERE') {
+        setError('Missing OpenAI API key. Please add VITE_OPENAI_API_KEY to your .env file.');
+        return;
+      }
+
+      setStatus('Sending receipt to OpenAI...');
 
       try {
         const prompt = `Analyze this receipt image and extract purchased items.
@@ -61,10 +68,11 @@ JSON format:
   "service": 500
 }`;
 
-        const response = await fetch('/api/receipt-ocr', {
+        const response = await fetch('https://api.openai.com/v1/responses', {
           method: 'POST',
           headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${apiKey}`
           },
           body: JSON.stringify({
             model: OPENAI_MODEL,
