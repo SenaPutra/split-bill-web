@@ -1,8 +1,25 @@
-import { defineConfig } from 'vite'
+import { defineConfig, loadEnv } from 'vite'
 import react from '@vitejs/plugin-react'
 
-// https://vite.dev/config/
-export default defineConfig({
-  plugins: [react()],
-  base: './', // Ensures relative paths for assets (supports proxy subpaths)
+export default defineConfig(({ mode }) => {
+  const env = loadEnv(mode, process.cwd(), '')
+  const openAiApiKey = env.OPENAI_API_KEY || ''
+
+  return {
+    plugins: [react()],
+    base: './',
+    server: {
+      proxy: {
+        '/api/receipt-ocr': {
+          target: 'https://api.openai.com',
+          changeOrigin: true,
+          secure: true,
+          rewrite: () => '/v1/responses',
+          headers: openAiApiKey
+            ? { Authorization: `Bearer ${openAiApiKey}` }
+            : undefined
+        }
+      }
+    }
+  }
 })

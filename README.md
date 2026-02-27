@@ -8,8 +8,8 @@ Upload a receipt photo, let the AI extract the items, and easily drag-and-drop t
 
 ## 🚀 Features
 
--   **AI Receipt Scanning**: Uses **Tesseract.js** to run OCR directly in your browser. No data leaves your device privacy-first!
--   **Smart Parsing**: Automatically detects items and prices from raw receipt text.
+-   **AI Receipt Scanning**: Uses **OpenAI Vision** to extract receipt items, tax, and service amounts from uploaded receipt photos.
+-   **Smart Parsing**: Automatically structures item name, unit price, quantity, tax, and service.
 -   **Interactive Editor**: Fix any typos or scanning errors before you split.
 -   **Easy Splitting**:
     -   Create profiles for everyone at the table.
@@ -24,24 +24,25 @@ Upload a receipt photo, let the AI extract the items, and easily drag-and-drop t
 -   **Frontend**: React 18, Vite
 -   **Language**: JavaScript
 -   **Styling**: Vanilla CSS (Variables, Glassmorphism), Lucide React (Icons)
--   **AI/OCR**: Tesseract.js (Client-side WASM)
+-   **AI/OCR**: OpenAI Responses API (Vision)
 -   **Containerization**: Docker, Docker Compose, Nginx
 
 ## 🐳 How to Run
 
 ### Option 1: Using Docker (Recommended)
 
-The easiest way to run the app is using Docker. This will build a production-ready image served by Nginx.
+The easiest way to run the app is using Docker. This will build a production-ready image served by Nginx with a backend proxy to OpenAI so API keys are not exposed in browser DevTools.
 
 1.  Make sure you have Docker Installed.
-2.  Run the following command in the project root:
+2.  Set environment variable in shell or `.env`: `OPENAI_API_KEY=...`
+3.  Run the following command in the project root:
 
     ```bash
     docker compose up -d --build
     ```
 
-3.  Open your browser and visit:
-    👉 **http://localhost:8080**
+4.  Open your browser and visit:
+    👉 **http://localhost:7771**
 
 ### Option 2: Local Development
 
@@ -51,11 +52,12 @@ If you want to edit the code or run it without Docker:
     ```bash
     npm install
     ```
-2.  Start the development server:
+2.  Add your OpenAI key to `.env` as `OPENAI_API_KEY=...` (do not use `VITE_` prefix, this keeps it server-side).
+3.  Start the development server:
     ```bash
     npm run dev
     ```
-3.  Open the link shown in the terminal (usually `http://localhost:5173`).
+4.  Open the link shown in the terminal (usually `http://localhost:5173`).
 
 ## 📂 Project Structure
 
@@ -63,7 +65,7 @@ If you want to edit the code or run it without Docker:
 ├── src/
 │   ├── components/
 │   │   ├── ImageUploader.jsx    # Drag & drop input
-│   │   ├── ReceiptProcessor.jsx # Tesseract OCR logic
+│   │   ├── ReceiptProcessor.jsx # OpenAI Vision extraction logic
 │   │   ├── ItemEditor.jsx       # Edit parsed items
 │   │   ├── PersonSetup.jsx      # Add friends
 │   │   ├── Splitter.jsx         # Assign items
