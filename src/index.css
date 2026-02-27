@@ -158,3 +158,11 @@ input:focus {
 .animate-spin {
   animation: spin 1s linear infinite;
 }
+.step-shell {
+  will-change: transform, opacity;
+  transform-origin: top center;
+}
+
+.title-line {
+  will-change: transform, opacity;
+}
