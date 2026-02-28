@@ -22,6 +22,16 @@ function App() {
 
   // Theme State
   const [theme, setTheme] = useState('dark');
+  const [headerAnimated, setHeaderAnimated] = useState(false);
+
+  const steps = [
+    { key: 'upload', label: 'Upload' },
+    { key: 'processing', label: 'Scan' },
+    { key: 'edit', label: 'Edit' },
+    { key: 'people', label: 'Bestie' },
+    { key: 'split', label: 'Split' },
+    { key: 'summary', label: 'Result' }
+  ];
 
   const headerRef = useRef(null);
   const stepContentRef = useRef(null);
@@ -42,14 +52,49 @@ function App() {
           targets: '.title-line',
           translateY: [22, 0],
           opacity: [0, 1],
-          delay: animeRef.current.stagger(120)
+          delay: animeRef.current.stagger(110)
         })
         .add({
           targets: '.theme-toggle',
           scale: [0.8, 1],
           rotate: ['-12deg', '0deg'],
           opacity: [0, 1]
-        }, '-=550');
+        }, '-=550')
+        .add({
+          targets: '.anime-orb',
+          opacity: [0, 1],
+          scale: [0.6, 1],
+          translateY: [16, 0],
+          delay: animeRef.current.stagger(120)
+        }, '-=650');
+
+      animeRef.current({
+        targets: '.version-pill',
+        scale: [1, 1.08, 1],
+        duration: 2200,
+        easing: 'easeInOutSine',
+        loop: true
+      });
+
+      animeRef.current({
+        targets: '.anime-orb-left',
+        translateY: [-8, 12, -8],
+        translateX: [0, -10, 0],
+        duration: 4200,
+        easing: 'easeInOutSine',
+        loop: true
+      });
+
+      animeRef.current({
+        targets: '.anime-orb-right',
+        translateY: [10, -12, 10],
+        translateX: [0, 12, 0],
+        duration: 4600,
+        easing: 'easeInOutSine',
+        loop: true
+      });
+
+      setHeaderAnimated(true);
     };
 
     if (window.anime) {
@@ -89,6 +134,21 @@ function App() {
       easing: 'easeOutQuart'
     });
   }, [step]);
+
+
+  useEffect(() => {
+    if (!headerAnimated || !animeRef.current) {
+      return;
+    }
+
+    animeRef.current.remove('.step-pill.is-active');
+    animeRef.current({
+      targets: '.step-pill.is-active',
+      scale: [0.92, 1.05, 1],
+      duration: 520,
+      easing: 'easeOutBack'
+    });
+  }, [step, headerAnimated]);
 
   const toggleTheme = () => {
     setTheme(prev => prev === 'dark' ? 'light' : 'dark');
@@ -141,6 +201,8 @@ function App() {
 
   return (
     <div className="container">
+      <div className="anime-orb anime-orb-left" aria-hidden="true" />
+      <div className="anime-orb anime-orb-right" aria-hidden="true" />
       <header
         ref={headerRef}
         style={{
@@ -153,6 +215,7 @@ function App() {
           position: 'relative'
         }}
       >
+        <span className="version-pill title-line">V2</span>
         <button
           onClick={toggleTheme}
           className="glass-panel theme-toggle"
@@ -177,7 +240,7 @@ function App() {
           className="title-line"
           style={{
             fontSize: '2.5rem',
-            background: 'linear-gradient(to right, #818cf8, #c084fc)',
+            background: 'linear-gradient(95deg, #22d3ee 0%, #8b5cf6 50%, #ec4899 100%)',
             WebkitBackgroundClip: 'text',
             WebkitTextFillColor: 'transparent',
             opacity: 0
@@ -185,7 +248,17 @@ function App() {
         >
           Split Bill Babitampan
         </h1>
-        <p className="title-line" style={{ color: 'var(--text-secondary)', opacity: 0 }}>Scan, Edit, and Split costs like a boss.</p>
+        <p className="title-line" style={{ color: 'var(--text-secondary)', opacity: 0 }}>Scan, edit, split — vibes only 💅</p>
+        <div className="step-pill-wrap title-line" style={{ opacity: 0 }}>
+          {steps.map((item) => (
+            <span
+              key={item.key}
+              className={`step-pill ${step === item.key ? 'is-active' : ''}`}
+            >
+              {item.label}
+            </span>
+          ))}
+        </div>
       </header>
 
       <main ref={stepContentRef} className="step-shell" style={{ width: '100%', display: 'flex', justifyContent: 'center' }}>

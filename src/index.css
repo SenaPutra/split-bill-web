@@ -1,12 +1,12 @@
 :root {
   /* Default Dark Mode */
-  --bg-color: #0f172a;
+  --bg-color: #090b1a;
   --text-primary: #f8fafc;
-  --text-secondary: #94a3b8;
-  --accent-color: #6366f1;
+  --text-secondary: #a5b4fc;
+  --accent-color: #a855f7;
   /* Indigo 500 */
-  --accent-glow: rgba(99, 102, 241, 0.4);
-  --glass-bg: rgba(30, 41, 59, 0.7);
+  --accent-glow: rgba(236, 72, 153, 0.35);
+  --glass-bg: rgba(30, 18, 56, 0.62);
   --glass-border: rgba(255, 255, 255, 0.1);
   --card-bg: #1e293b;
   --success: #10b981;
@@ -16,12 +16,12 @@
 }
 
 [data-theme="light"] {
-  --bg-color: #f8fafc;
+  --bg-color: #faf5ff;
   --text-primary: #1e293b;
-  --text-secondary: #64748b;
-  --accent-color: #4f46e5;
+  --text-secondary: #7c3aed;
+  --accent-color: #d946ef;
   /* Indigo 600 */
-  --accent-glow: rgba(79, 70, 229, 0.2);
+  --accent-glow: rgba(236, 72, 153, 0.25);
   --glass-bg: rgba(255, 255, 255, 0.7);
   --glass-border: rgba(0, 0, 0, 0.1);
   --card-bg: #ffffff;
@@ -43,14 +43,42 @@ body {
   -webkit-font-smoothing: antialiased;
   transition: background-color 0.3s ease, color 0.3s ease;
   background-image:
-    radial-gradient(circle at 15% 50%, var(--accent-glow), transparent 25%),
-    radial-gradient(circle at 85% 30%, var(--accent-glow), transparent 25%);
+    radial-gradient(circle at 8% 18%, rgba(34, 211, 238, 0.26), transparent 22%),
+    radial-gradient(circle at 86% 12%, var(--accent-glow), transparent 24%),
+    radial-gradient(circle at 52% 88%, rgba(168, 85, 247, 0.22), transparent 24%);
 }
 
 #root {
   max-width: 1200px;
   margin: 0 auto;
   padding: 2rem;
+  position: relative;
+}
+
+
+.anime-orb {
+  position: fixed;
+  border-radius: 999px;
+  filter: blur(2px);
+  pointer-events: none;
+  z-index: -1;
+  opacity: 0;
+}
+
+.anime-orb-left {
+  width: 180px;
+  height: 180px;
+  left: -40px;
+  top: 120px;
+  background: radial-gradient(circle at 30% 30%, rgba(34, 211, 238, 0.75), rgba(34, 211, 238, 0.08));
+}
+
+.anime-orb-right {
+  width: 220px;
+  height: 220px;
+  right: -55px;
+  top: 290px;
+  background: radial-gradient(circle at 30% 30%, rgba(236, 72, 153, 0.75), rgba(236, 72, 153, 0.12));
 }
 
 h1,
@@ -167,6 +195,47 @@ input:focus {
   will-change: transform, opacity;
 }
 
+
+.version-pill {
+  position: absolute;
+  left: 0;
+  top: 0;
+  padding: 0.35rem 0.75rem;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #22d3ee, #8b5cf6, #f472b6);
+  color: #fff;
+  font-size: 0.8rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  box-shadow: 0 0 22px rgba(236, 72, 153, 0.5);
+}
+
+.step-pill-wrap {
+  margin-top: 1rem;
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.step-pill {
+  border: 1px solid var(--glass-border);
+  background: rgba(255, 255, 255, 0.08);
+  color: color-mix(in srgb, var(--text-secondary) 80%, #ffffff 20%);
+  border-radius: 999px;
+  padding: 0.3rem 0.75rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.step-pill.is-active {
+  color: #fff;
+  border-color: transparent;
+  background: linear-gradient(90deg, #22d3ee 0%, #8b5cf6 45%, #ec4899 100%);
+  box-shadow: 0 0 18px rgba(236, 72, 153, 0.5);
+}
 .bill-summary-shell {
   width: 100%;
   max-width: 900px;
@@ -206,7 +275,7 @@ input:focus {
 }
 
 .bill-summary-card {
-  background: rgba(255, 255, 255, 0.05);
+  background: rgba(255, 255, 255, 0.08);
   border-radius: 16px;
   overflow: hidden;
   display: flex;
@@ -222,6 +291,16 @@ input:focus {
 }
 
 @media (max-width: 768px) {
+  .anime-orb {
+    display: none;
+  }
+
+
+  .version-pill {
+    position: static;
+    margin-bottom: 0.6rem;
+  }
+
   #root {
     padding: 1rem;
   }
