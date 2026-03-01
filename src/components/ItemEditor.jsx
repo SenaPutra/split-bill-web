@@ -42,8 +42,9 @@ export default function ItemEditor({ items, onUpdateItems, taxRate, setTaxRate, 
   };
 
   const subtotal = items.reduce((sum, item) => sum + lineTotal(item), 0);
-  const taxAmount = subtotal * (taxRate / 100);
   const serviceAmount = subtotal * (serviceRate / 100);
+  const taxBase = subtotal + serviceAmount;
+  const taxAmount = taxBase * (taxRate / 100);
   const grandTotal = subtotal + taxAmount + serviceAmount;
 
   return (

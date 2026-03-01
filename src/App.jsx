@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+﻿import React, { useState, useEffect, useRef } from 'react';
 import ImageUploader from './components/ImageUploader';
 import ReceiptProcessor from './components/ReceiptProcessor';
 import ItemEditor from './components/ItemEditor';
@@ -174,11 +174,14 @@ function App() {
     const subtotal = foundItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
 
     if (subtotal > 0) {
-      if (foundTax > 0) {
-        setTaxRate(parseFloat(((foundTax / subtotal) * 100).toFixed(2)));
-      }
       if (foundService > 0) {
         setServiceRate(parseFloat(((foundService / subtotal) * 100).toFixed(2)));
+      }
+      if (foundTax > 0) {
+        const taxBase = subtotal + foundService;
+        if (taxBase > 0) {
+          setTaxRate(parseFloat(((foundTax / taxBase) * 100).toFixed(2)));
+        }
       }
     }
 
@@ -248,7 +251,7 @@ function App() {
         >
           Split Bill Babitampan
         </h1>
-        <p className="title-line" style={{ color: 'var(--text-secondary)', opacity: 0 }}>Scan, edit, split — vibes only 💅</p>
+        <p className="title-line" style={{ color: 'var(--text-secondary)', opacity: 0 }}>Upload struk, bagi patungan, tetap bestie-an. 😎</p>
         <div className="step-pill-wrap title-line" style={{ opacity: 0 }}>
           {steps.map((item) => (
             <span
@@ -306,3 +309,4 @@ function App() {
 }
 
 export default App;
+

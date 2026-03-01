@@ -42,8 +42,9 @@ export default function BillSummary({ items, people, assignments, taxRate, servi
       assignedSubtotal += lineTotal(item);
     });
 
-    const totalTaxAmt = assignedSubtotal * (taxRate / 100);
     const totalServiceAmt = assignedSubtotal * (serviceRate / 100);
+    const taxBase = assignedSubtotal + totalServiceAmt;
+    const totalTaxAmt = taxBase * (taxRate / 100);
 
     people.forEach((p) => {
       const person = totals[p.id];
