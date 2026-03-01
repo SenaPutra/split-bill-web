@@ -90,4 +90,4 @@ If you want to edit the code or run it without Docker:
 
 ---
 
-Built with ❤️ by Antigravity
+Built with ❤️ by Babi & Fren's
