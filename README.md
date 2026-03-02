@@ -41,12 +41,23 @@ The easiest way to run the app is using Docker. This will build a production-rea
     docker compose up -d --build
     ```
 
-    Or if you prefer plain Docker (without Compose):
+    Or if you prefer plain Docker (without Compose), run these commands to avoid stale container/image issues:
 
     ```bash
-    docker build -t split-bill-web .
-    docker run -d --name split-bill-web -p 7771:80 -e OPENAI_API_KEY=$OPENAI_API_KEY split-bill-web
+    docker rm -f split-bill-web 2>/dev/null || true
+    docker build --no-cache -t split-bill-web .
+    docker run -d --name split-bill-web -p 7771:80 -e OPENAI_API_KEY="$OPENAI_API_KEY" split-bill-web
     ```
+
+    Quick check for OCR route (should return JSON error from OpenAI, **not** nginx 404):
+
+    ```bash
+    curl -i -X POST http://localhost:7771/api/receipt-ocr \
+      -H 'content-type: application/json' \
+      -d '{"model":"gpt-4.1-mini","input":"test"}'
+    ```
+
+    If you still see `404 Not Found` from nginx, it usually means an old image/container is still running. Re-run the 3 commands above and hard refresh browser (Ctrl/Cmd+Shift+R).
 
 4.  Open your browser and visit:
     👉 **http://localhost:7771**
@@ -81,7 +92,7 @@ If you want to edit the code or run it without Docker:
 │   └── index.css                # Premium Dark Theme styles
 ├── Dockerfile                   # Multi-stage build (Node -> Nginx)
 ├── docker-compose.yml           # Container orchestration
-└── nginx.conf                   # Web server config
+└── nginx.conf.template          # Nginx template for OpenAI proxy route
 ```
 
 ## 📝 Usage Guide
