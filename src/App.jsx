@@ -208,50 +208,23 @@ function App() {
       <div className="anime-orb anime-orb-right" aria-hidden="true" />
       <header
         ref={headerRef}
-        style={{
-          textAlign: 'center',
-          margin: '2rem 0',
-          width: '100%',
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          position: 'relative'
-        }}
+        className="app-header"
       >
         <span className="version-pill title-line">V2</span>
         <button
           onClick={toggleTheme}
           className="glass-panel theme-toggle"
-          style={{
-            position: 'absolute',
-            right: 0,
-            top: 0,
-            padding: '0.5rem',
-            borderRadius: '50%',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            background: 'var(--glass-bg)',
-            opacity: 0
-          }}
           aria-label="Toggle Theme"
         >
           {theme === 'dark' ? <Sun size={20} color="var(--text-primary)" /> : <Moon size={20} color="var(--text-primary)" />}
         </button>
 
         <h1
-          className="title-line"
-          style={{
-            fontSize: '2.5rem',
-            background: 'linear-gradient(95deg, #22d3ee 0%, #8b5cf6 50%, #ec4899 100%)',
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent',
-            opacity: 0
-          }}
+          className="title-line app-title"
         >
           Split Bill Babitampan
         </h1>
-        <p className="title-line" style={{ color: 'var(--text-secondary)', opacity: 0 }}>Upload struk, bagi patungan, tetap bestie-an. 😎</p>
+        <p className="title-line app-subtitle">Upload struk, bagi patungan, tetap bestie-an. 😎</p>
         <div className="step-pill-wrap title-line" style={{ opacity: 0 }}>
           {steps.map((item) => (
             <span
@@ -309,4 +282,3 @@ function App() {
 }
 
 export default App;
-
