@@ -41,6 +41,13 @@ The easiest way to run the app is using Docker. This will build a production-rea
     docker compose up -d --build
     ```
 
+    Or if you prefer plain Docker (without Compose):
+
+    ```bash
+    docker build -t split-bill-web .
+    docker run -d --name split-bill-web -p 7771:80 -e OPENAI_API_KEY=$OPENAI_API_KEY split-bill-web
+    ```
+
 4.  Open your browser and visit:
     👉 **http://localhost:7771**
 
