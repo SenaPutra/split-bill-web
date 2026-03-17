@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Loader2, AlertCircle } from 'lucide-react';
 
-const OPENAI_MODEL = 'gpt-4.1-mini';
+const OPENAI_MODEL = 'gpt-5-mini';
 
 const extractJson = (rawText) => {
   const cleaned = rawText.replace(/```json/gi, '').replace(/```/g, '').trim();
