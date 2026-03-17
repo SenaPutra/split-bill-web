@@ -54,7 +54,7 @@ The easiest way to run the app is using Docker. This will build a production-rea
     ```bash
     curl -i -X POST http://localhost:7771/api/receipt-ocr \
       -H 'content-type: application/json' \
-      -d '{"model":"gpt-4.1-mini","input":"test"}'
+      -d '{"model":"gpt-5-mini","input":"test"}'
     ```
 
     If you still see `404 Not Found` from nginx, it usually means an old image/container is still running. Re-run the 3 commands above and hard refresh browser (Ctrl/Cmd+Shift+R).
@@ -71,6 +71,7 @@ If you want to edit the code or run it without Docker:
     npm install
     ```
 2.  Add your OpenAI key to `.env` as `OPENAI_API_KEY=...` (do not use `VITE_` prefix, this keeps it server-side).
+    - Optional: force model from frontend with `VITE_OPENAI_MODEL=gpt-5-mini` to avoid stale/default confusion.
 3.  Start the development server:
     ```bash
     npm run dev
