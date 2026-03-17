@@ -71,6 +71,7 @@ If you want to edit the code or run it without Docker:
     npm install
     ```
 2.  Add your OpenAI key to `.env` as `OPENAI_API_KEY=...` (do not use `VITE_` prefix, this keeps it server-side).
+    - Optional: force model from frontend with `VITE_OPENAI_MODEL=gpt-5-mini` to avoid stale/default confusion.
 3.  Start the development server:
     ```bash
     npm run dev

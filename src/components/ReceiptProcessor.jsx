@@ -76,8 +76,7 @@ JSON format:
                   { type: 'input_image', image_url: image }
                 ]
               }
-            ],
-            temperature: 0
+            ]
           })
         });
 
