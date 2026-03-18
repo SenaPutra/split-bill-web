@@ -3,7 +3,7 @@ import { RefreshCcw } from 'lucide-react';
 
 const lineTotal = (item) => (Number(item.price) || 0) * (Number(item.quantity) || 1);
 
-export default function BillSummary({ items, people, assignments, taxRate, serviceRate, onReset }) {
+export default function BillSummary({ items, people, assignments, taxRate, serviceRate, discountAmount, onReset }) {
   const calculateTotals = () => {
     const totals = {};
     let assignedSubtotal = 0;
@@ -15,6 +15,7 @@ export default function BillSummary({ items, people, assignments, taxRate, servi
         subtotal: 0,
         taxShare: 0,
         serviceShare: 0,
+        discountShare: 0,
         total: 0,
         items: []
       };
@@ -42,8 +43,10 @@ export default function BillSummary({ items, people, assignments, taxRate, servi
       assignedSubtotal += lineTotal(item);
     });
 
-    const totalServiceAmt = assignedSubtotal * (serviceRate / 100);
-    const taxBase = assignedSubtotal + totalServiceAmt;
+    const totalDiscountAmt = Math.min(Math.max(0, Number(discountAmount) || 0), assignedSubtotal);
+    const discountedSubtotal = Math.max(0, assignedSubtotal - totalDiscountAmt);
+    const totalServiceAmt = discountedSubtotal * (serviceRate / 100);
+    const taxBase = discountedSubtotal + totalServiceAmt;
     const totalTaxAmt = taxBase * (taxRate / 100);
 
     people.forEach((p) => {
@@ -53,22 +56,24 @@ export default function BillSummary({ items, people, assignments, taxRate, servi
       }
 
       const ratio = person.subtotal / assignedSubtotal;
+      person.discountShare = totalDiscountAmt * ratio;
       person.taxShare = totalTaxAmt * ratio;
       person.serviceShare = totalServiceAmt * ratio;
-      person.total = person.subtotal + person.taxShare + person.serviceShare;
+      person.total = person.subtotal - person.discountShare + person.taxShare + person.serviceShare;
     });
 
     return {
       peopleTotals: Object.values(totals),
       assignedSubtotal,
       totalTaxAmt,
-      totalServiceAmt
+      totalServiceAmt,
+      totalDiscountAmt
     };
   };
 
-  const { peopleTotals, assignedSubtotal, totalTaxAmt, totalServiceAmt } = calculateTotals();
+  const { peopleTotals, assignedSubtotal, totalTaxAmt, totalServiceAmt, totalDiscountAmt } = calculateTotals();
   const allSubtotal = items.reduce((sum, item) => sum + lineTotal(item), 0);
-  const grandTotal = assignedSubtotal + totalTaxAmt + totalServiceAmt;
+  const grandTotal = Math.max(0, assignedSubtotal - totalDiscountAmt) + totalTaxAmt + totalServiceAmt;
   const unassignedSubtotal = allSubtotal - assignedSubtotal;
 
   return (
@@ -79,6 +84,7 @@ export default function BillSummary({ items, people, assignments, taxRate, servi
         <div className="bill-summary-meta">
           <div className="bill-summary-stats">
             <span>Assigned Subtotal: {assignedSubtotal.toFixed(2)}</span>
+            <span>Discount: -{totalDiscountAmt.toFixed(2)}</span>
             <span>Tax ({taxRate}%): {totalTaxAmt.toFixed(2)}</span>
             <span>Svc ({serviceRate}%): {totalServiceAmt.toFixed(2)}</span>
           </div>
@@ -102,7 +108,7 @@ export default function BillSummary({ items, people, assignments, taxRate, servi
                 <span style={{ fontSize: '1.35rem', fontWeight: '800' }}>{person.total.toFixed(2)}</span>
               </div>
               <div style={{ fontSize: '0.8rem', opacity: 0.8 }}>
-                Sub: {person.subtotal.toFixed(2)} | +{(person.taxShare + person.serviceShare).toFixed(2)} fees
+                Sub: {person.subtotal.toFixed(2)} | -{person.discountShare.toFixed(2)} +{(person.taxShare + person.serviceShare).toFixed(2)} fees
               </div>
             </div>
             <div style={{ padding: '1rem', display: 'flex', flexDirection: 'column', gap: '0.5rem', flex: 1 }}>

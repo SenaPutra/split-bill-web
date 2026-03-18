@@ -16,9 +16,10 @@ function App() {
   const [people, setPeople] = useState([]);
   const [assignments, setAssignments] = useState({}); // { itemId: [personId, ...] }
 
-  // Tax & Service State
+  // Tax, Service & Discount State
   const [taxRate, setTaxRate] = useState(10);
   const [serviceRate, setServiceRate] = useState(5);
+  const [discountAmount, setDiscountAmount] = useState(0);
 
   // Theme State
   const [theme, setTheme] = useState('dark');
@@ -170,6 +171,7 @@ function App() {
 
   const handleItemsFound = (foundItems, foundTax = 0, foundService = 0) => {
     setItems(foundItems);
+    setDiscountAmount(0);
 
     const subtotal = foundItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
 
@@ -200,6 +202,7 @@ function App() {
     setAssignments({});
     setTaxRate(10);
     setServiceRate(5);
+    setDiscountAmount(0);
   };
 
   return (
@@ -250,6 +253,8 @@ function App() {
             setTaxRate={setTaxRate}
             serviceRate={serviceRate}
             setServiceRate={setServiceRate}
+            discountAmount={discountAmount}
+            setDiscountAmount={setDiscountAmount}
             onNext={() => setStep('people')}
           />
         )}
@@ -273,6 +278,7 @@ function App() {
             assignments={assignments}
             taxRate={taxRate}
             serviceRate={serviceRate}
+            discountAmount={discountAmount}
             onReset={handleReset}
           />
         )}

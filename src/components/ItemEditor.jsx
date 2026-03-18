@@ -3,7 +3,17 @@ import { Plus, Trash2, Edit2, Check } from 'lucide-react';
 
 const lineTotal = (item) => (Number(item.price) || 0) * (Number(item.quantity) || 1);
 
-export default function ItemEditor({ items, onUpdateItems, taxRate, setTaxRate, serviceRate, setServiceRate, onNext }) {
+export default function ItemEditor({
+  items,
+  onUpdateItems,
+  taxRate,
+  setTaxRate,
+  serviceRate,
+  setServiceRate,
+  discountAmount,
+  setDiscountAmount,
+  onNext
+}) {
   const [editingId, setEditingId] = useState(null);
   const [editForm, setEditForm] = useState({ name: '', price: '', quantity: '' });
 
@@ -42,10 +52,12 @@ export default function ItemEditor({ items, onUpdateItems, taxRate, setTaxRate, 
   };
 
   const subtotal = items.reduce((sum, item) => sum + lineTotal(item), 0);
-  const serviceAmount = subtotal * (serviceRate / 100);
-  const taxBase = subtotal + serviceAmount;
+  const appliedDiscount = Math.min(Math.max(0, Number(discountAmount) || 0), subtotal);
+  const discountedSubtotal = Math.max(0, subtotal - appliedDiscount);
+  const serviceAmount = discountedSubtotal * (serviceRate / 100);
+  const taxBase = discountedSubtotal + serviceAmount;
   const taxAmount = taxBase * (taxRate / 100);
-  const grandTotal = subtotal + taxAmount + serviceAmount;
+  const grandTotal = discountedSubtotal + taxAmount + serviceAmount;
 
   return (
     <div className="glass-panel animate-fade-in" style={{ width: '100%', maxWidth: '800px', display: 'flex', flexDirection: 'column', height: '80vh' }}>
@@ -126,7 +138,7 @@ export default function ItemEditor({ items, onUpdateItems, taxRate, setTaxRate, 
 
       <div style={{ padding: '1rem', borderTop: '1px solid var(--glass-border)', background: 'rgba(0,0,0,0.2)', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
-          <div style={{ display: 'flex', gap: '1.5rem' }}>
+          <div style={{ display: 'flex', gap: '1.5rem', flexWrap: 'wrap' }}>
             <div style={{ display: 'flex', flexDirection: 'column' }}>
               <label style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>Tax (%)</label>
               <input
@@ -145,10 +157,22 @@ export default function ItemEditor({ items, onUpdateItems, taxRate, setTaxRate, 
                 style={{ width: '70px', padding: '0.25rem' }}
               />
             </div>
+            <div style={{ display: 'flex', flexDirection: 'column' }}>
+              <label style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>Discount</label>
+              <input
+                type="number"
+                min={0}
+                value={discountAmount}
+                onChange={(e) => setDiscountAmount(Math.max(0, Number(e.target.value)))}
+                style={{ width: '110px', padding: '0.25rem' }}
+                placeholder="0"
+              />
+            </div>
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', fontSize: '0.9rem' }}>
             <div style={{ color: 'var(--text-secondary)' }}>Subtotal: {subtotal.toFixed(2)}</div>
+            <div style={{ color: appliedDiscount > 0 ? 'var(--success)' : 'var(--text-secondary)' }}>- Discount: {appliedDiscount.toFixed(2)}</div>
             <div style={{ color: 'var(--text-secondary)' }}>+ Tax: {taxAmount.toFixed(2)}</div>
             <div style={{ color: 'var(--text-secondary)' }}>+ Service: {serviceAmount.toFixed(2)}</div>
           </div>
