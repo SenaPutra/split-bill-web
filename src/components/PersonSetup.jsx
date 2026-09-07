@@ -23,20 +23,20 @@ export default function PersonSetup({ people, setPeople, onNext }) {
 
   return (
     <section className="flow-card people-card">
-      <div className="section-label-bar">Player register</div>
-      <h2>Who is splitting?</h2>
+      <div className="section-label-bar">Teman makan</div>
+      <h2>Siapa yang ikut?</h2>
 
       <form onSubmit={addPerson} className="inline-form">
         <input
           type="text"
-          placeholder="Enter name"
+          placeholder="Nama teman"
           value={name}
           onChange={(event) => setName(event.target.value)}
           autoFocus
         />
         <button type="submit" className="btn-submit" disabled={!name.trim()} aria-label="Add person">
           <UserPlus size={17} />
-          Add
+          Tambah
         </button>
       </form>
 
@@ -60,7 +60,7 @@ export default function PersonSetup({ people, setPeople, onNext }) {
 
       <div className="flow-actions">
         <button className="btn-submit" onClick={onNext} disabled={people.length === 0}>
-          Start splitting
+          Mulai bagi pesanan
         </button>
       </div>
     </section>

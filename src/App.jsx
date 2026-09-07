@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
+import { Check, CircleDollarSign, Pencil, ReceiptText, RotateCcw, ScanLine, Sparkles, Users } from 'lucide-react';
 import ImageUploader from './components/ImageUploader';
 import ReceiptProcessor from './components/ReceiptProcessor';
 import ItemEditor from './components/ItemEditor';
@@ -10,216 +11,93 @@ import BillPage from './components/BillPage';
 import DesignPreview from './components/DesignPreview';
 import { stripBasePath, withBasePath } from './utils/basePath';
 
+const FLOW = [
+  { key: 'upload', label: 'Struk', icon: ReceiptText },
+  { key: 'processing', label: 'Pindai', icon: ScanLine },
+  { key: 'edit', label: 'Periksa', icon: Pencil },
+  { key: 'people', label: 'Teman', icon: Users },
+  { key: 'split', label: 'Bagi', icon: CircleDollarSign },
+  { key: 'summary', label: 'Beres', icon: Sparkles }
+];
+
 const parseRoute = () => {
   const segments = stripBasePath(window.location.pathname).split('/').filter(Boolean);
-  if (segments[0] === 'design-system' || segments[0] === 'design-preview') {
-    return { mode: 'design' };
-  }
-
-  if (segments[0] !== 'bill' || !segments[1]) {
-    return { mode: 'home' };
-  }
-
-  if (segments[2] === 'pay' && segments[3]) {
-    return { mode: 'pay', billId: segments[1], personId: segments[3] };
-  }
-
-  if (segments[2] === 'admin' && segments[3]) {
-    return { mode: 'admin', billId: segments[1], adminToken: segments[3] };
-  }
-
+  if (segments[0] === 'design-system' || segments[0] === 'design-preview') return { mode: 'design' };
+  if (segments[0] !== 'bill' || !segments[1]) return { mode: 'home' };
+  if (segments[2] === 'pay' && segments[3]) return { mode: 'pay', billId: segments[1], personId: segments[3] };
+  if (segments[2] === 'admin' && segments[3]) return { mode: 'admin', billId: segments[1], adminToken: segments[3] };
   return { mode: 'public', billId: segments[1] };
 };
 
-function App() {
-  const [route, setRoute] = useState(parseRoute);
-  const [step, setStep] = useState('upload'); // upload, processing, edit, people, split, summary
-  const [image, setImage] = useState(null);
-  const [items, setItems] = useState([]);
-  const [people, setPeople] = useState([]);
-  const [assignments, setAssignments] = useState({}); // { itemId: { [personId]: portionOrShareFlag } }
+function BrandMark() {
+  return <span className="brand-mark" aria-hidden="true"><i /><i /></span>;
+}
 
-  const [taxRate, setTaxRate] = useState(10);
-  const [serviceRate, setServiceRate] = useState(5);
-  const [discountAmount, setDiscountAmount] = useState(0);
-  const [paymentMethod, setPaymentMethod] = useState({
-    bankName: '',
-    accountNumber: '',
-    accountHolder: '',
-    qrisText: ''
-  });
-
-  const isRemoteBillRoute = route.mode !== 'home';
-  const isDesignRoute = route.mode === 'design';
-  const remoteStepLabel = route.mode === 'pay' ? 'Pay' : route.mode === 'admin' ? 'Admin' : 'Bill';
-
-  const steps = isRemoteBillRoute ? [
-    { key: remoteStepLabel.toLowerCase(), label: remoteStepLabel }
-  ] : [
-    { key: 'upload', label: 'Upload' },
-    { key: 'processing', label: 'Scan' },
-    { key: 'edit', label: 'Edit' },
-    { key: 'people', label: 'People' },
-    { key: 'split', label: 'Split' },
-    { key: 'summary', label: 'Result' }
-  ];
-
-  const activeStepIndex = isRemoteBillRoute ? 0 : Math.max(0, steps.findIndex((item) => item.key === step));
-
-  const navigate = (path) => {
-    window.history.pushState({}, '', withBasePath(path));
-    setRoute(parseRoute());
-  };
-
-  useEffect(() => {
-    const handlePopState = () => setRoute(parseRoute());
-    window.addEventListener('popstate', handlePopState);
-    return () => window.removeEventListener('popstate', handlePopState);
-  }, []);
-
-  const handleImageUpload = (imgData) => {
-    setImage(imgData);
-    setStep('processing');
-  };
-
-  const handleItemsFound = (foundItems, foundTax = 0, foundService = 0) => {
-    setItems(foundItems);
-    setDiscountAmount(0);
-
-    const subtotal = foundItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-
-    if (subtotal > 0) {
-      if (foundService > 0) {
-        setServiceRate(parseFloat(((foundService / subtotal) * 100).toFixed(2)));
-      }
-      if (foundTax > 0) {
-        const taxBase = subtotal + foundService;
-        if (taxBase > 0) {
-          setTaxRate(parseFloat(((foundTax / taxBase) * 100).toFixed(2)));
-        }
-      }
-    }
-
-    setStep('edit');
-  };
-
-  const handleItemsUpdate = (updatedItems) => {
-    setItems(updatedItems);
-  };
-
-  const handleReset = () => {
-    setStep('upload');
-    setImage(null);
-    setItems([]);
-    setPeople([]);
-    setAssignments({});
-    setTaxRate(10);
-    setServiceRate(5);
-    setDiscountAmount(0);
-    setPaymentMethod({ bankName: '', accountNumber: '', accountHolder: '', qrisText: '' });
-  };
-
-  if (isDesignRoute) {
-    return <DesignPreview navigate={navigate} />;
-  }
-
+function StepProgress({ step }) {
+  const active = Math.max(0, FLOW.findIndex((item) => item.key === step));
   return (
-    <div className="app-page">
-      <div className="console-shell">
-        <nav className="primary-nav" aria-label="Primary">
-          <button type="button" className="logo-pill" onClick={() => navigate('/')} aria-label="BarBa home">
-            <span className="mascot-mark">BB</span>
-            <span className="brand-wordmark">BarBa</span>
-          </button>
-          <p className="brand-tagline">Bayar Bagi</p>
-        </nav>
-
-        <div className="subnav-strip" aria-label="Workflow progress">
-          {steps.map((item, index) => (
-            <span
-              key={item.key}
-              className={`step-pill ${(isRemoteBillRoute || step === item.key) ? 'is-active' : ''} ${index < activeStepIndex ? 'is-complete' : ''}`}
-              aria-current={(isRemoteBillRoute || step === item.key) ? 'step' : undefined}
-            >
-              <span className="step-index" aria-hidden="true">{index + 1}</span>
-              {item.label}
-            </span>
-          ))}
-        </div>
-
-        <header className="hero-panel">
-          <div>
-            <p className="hero-kicker">BarBa · Bayar Bagi</p>
-            <h1>{isRemoteBillRoute ? 'Tagihan bareng kamu' : 'Bayar bareng jadi gampang.'}</h1>
-            <p className="hero-tagline">Unggah struk, periksa daftar pesanan, tentukan bagian masing-masing, lalu bagikan rincian tagihan dengan jelas.</p>
-          </div>
-          <div className="hero-orbit" aria-hidden="true">
-            <span className="orbit-ring" />
-            <span className="orbit-core">B</span>
-            <span className="orbit-dot" />
-          </div>
-        </header>
-
-        <div className="content-grid">
-          <main className="workflow-panel" id="upload">
-            {isRemoteBillRoute && <BillPage route={route} navigate={navigate} />}
-
-            {!isRemoteBillRoute && step === 'upload' && <ImageUploader onImageUpload={handleImageUpload} />}
-
-            {!isRemoteBillRoute && step === 'processing' && <ReceiptProcessor image={image} onItemsFound={handleItemsFound} />}
-
-            {!isRemoteBillRoute && step === 'edit' && (
-              <ItemEditor
-                items={items}
-                onUpdateItems={handleItemsUpdate}
-                  taxRate={taxRate}
-                setTaxRate={setTaxRate}
-                  serviceRate={serviceRate}
-                setServiceRate={setServiceRate}
-                  discountAmount={discountAmount}
-                setDiscountAmount={setDiscountAmount}
-                onNext={() => setStep('people')}
-              />
-            )}
-
-            {!isRemoteBillRoute && step === 'people' && <PersonSetup people={people} setPeople={setPeople} onNext={() => setStep('split')} />}
-
-            {!isRemoteBillRoute && step === 'split' && (
-              <Splitter
-                items={items}
-                  people={people}
-                  assignments={assignments}
-                setAssignments={setAssignments}
-                onNext={() => setStep('summary')}
-              />
-            )}
-
-            {!isRemoteBillRoute && step === 'summary' && (
-              <>
-                <PaymentMethodSetup paymentMethod={paymentMethod} setPaymentMethod={setPaymentMethod} />
-                <BillSummary
-                  items={items}
-                  people={people}
-                  assignments={assignments}
-                  taxRate={taxRate}
-                  serviceRate={serviceRate}
-                  discountAmount={discountAmount}
-                  paymentMethod={paymentMethod}
-                  onReset={handleReset}
-                />
-              </>
-            )}
-          </main>
-
-        </div>
-
-        <footer className="footer-bar">
-          <span>©2026 BarBa</span>
-          <span>Bayar Bagi</span>
-        </footer>
+    <div className="journey" aria-label={`Langkah ${active + 1} dari ${FLOW.length}: ${FLOW[active].label}`}>
+      <div className="journey-mobile"><strong>{String(active + 1).padStart(2, '0')} / 06</strong><span>· {FLOW[active].label}</span></div>
+      <div className="journey-rail"><span style={{ width: `${(active / (FLOW.length - 1)) * 100}%` }} /></div>
+      <div className="journey-steps">
+        {FLOW.map((item, index) => {
+          const Icon = item.icon;
+          return <div key={item.key} className={`journey-step ${index === active ? 'is-active' : ''} ${index < active ? 'is-complete' : ''}`} aria-current={index === active ? 'step' : undefined}>
+            <span>{index < active ? <Check size={15} /> : <Icon size={16} />}</span><small>{item.label}</small>
+          </div>;
+        })}
       </div>
     </div>
   );
 }
 
-export default App;
+export default function App() {
+  const [route, setRoute] = useState(parseRoute);
+  const [step, setStep] = useState('upload');
+  const [image, setImage] = useState(null);
+  const [items, setItems] = useState([]);
+  const [people, setPeople] = useState([]);
+  const [assignments, setAssignments] = useState({});
+  const [taxRate, setTaxRate] = useState(10);
+  const [serviceRate, setServiceRate] = useState(5);
+  const [discountAmount, setDiscountAmount] = useState(0);
+  const [paymentMethod, setPaymentMethod] = useState({ bankName: '', accountNumber: '', accountHolder: '', qrisText: '' });
+  const remote = route.mode !== 'home';
+
+  const navigate = useCallback((path) => { window.history.pushState({}, '', withBasePath(path)); setRoute(parseRoute()); }, []);
+  useEffect(() => { const onPop = () => setRoute(parseRoute()); window.addEventListener('popstate', onPop); return () => window.removeEventListener('popstate', onPop); }, []);
+  const handleItemsFound = useCallback((foundItems, foundTax = 0, foundService = 0) => {
+    setItems(foundItems); setDiscountAmount(0);
+    const subtotal = foundItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
+    if (subtotal > 0) {
+      if (foundService > 0) setServiceRate(Number(((foundService / subtotal) * 100).toFixed(2)));
+      if (foundTax > 0) setTaxRate(Number(((foundTax / (subtotal + foundService)) * 100).toFixed(2)));
+    }
+    setStep('edit');
+  }, []);
+  const reset = () => { setStep('upload'); setImage(null); setItems([]); setPeople([]); setAssignments({}); setTaxRate(10); setServiceRate(5); setDiscountAmount(0); setPaymentMethod({ bankName: '', accountNumber: '', accountHolder: '', qrisText: '' }); };
+
+  if (route.mode === 'design') return <DesignPreview navigate={navigate} />;
+  const context = remote ? (route.mode === 'pay' ? 'Bayar bagianmu' : route.mode === 'admin' ? 'Pantau pembayaran' : 'Rincian tagihan') : FLOW.find((x) => x.key === step)?.label;
+
+  return <div className="app-page">
+    <nav className="floating-nav" aria-label="Navigasi utama">
+      <button className="brand-button" onClick={() => navigate('/')} aria-label="Beranda BarBa"><BrandMark /><span><strong>BarBa</strong><small>Bayar Bagi</small></span></button>
+      <span className="nav-context">{context}</span>
+      {!remote && step !== 'upload' ? <button className="nav-action" onClick={reset} aria-label="Mulai pembagian baru" title="Mulai lagi"><RotateCcw size={18} /><span>Mulai lagi</span></button> : <span className="nav-dot" aria-hidden="true" />}
+    </nav>
+    <div className="app-shell">
+      {!remote && <StepProgress step={step} />}
+      <main className={`workflow-panel step-${step}`}>
+        {remote && <BillPage route={route} navigate={navigate} />}
+        {!remote && step === 'upload' && <ImageUploader onImageUpload={(data) => { setImage(data); setStep('processing'); }} />}
+        {!remote && step === 'processing' && <ReceiptProcessor image={image} onItemsFound={handleItemsFound} />}
+        {!remote && step === 'edit' && <ItemEditor items={items} onUpdateItems={setItems} taxRate={taxRate} setTaxRate={setTaxRate} serviceRate={serviceRate} setServiceRate={setServiceRate} discountAmount={discountAmount} setDiscountAmount={setDiscountAmount} onNext={() => setStep('people')} />}
+        {!remote && step === 'people' && <PersonSetup people={people} setPeople={setPeople} onNext={() => setStep('split')} />}
+        {!remote && step === 'split' && <Splitter items={items} people={people} assignments={assignments} setAssignments={setAssignments} onNext={() => setStep('summary')} />}
+        {!remote && step === 'summary' && <><PaymentMethodSetup paymentMethod={paymentMethod} setPaymentMethod={setPaymentMethod} /><BillSummary items={items} people={people} assignments={assignments} taxRate={taxRate} serviceRate={serviceRate} discountAmount={discountAmount} paymentMethod={paymentMethod} onReset={reset} /></>}
+      </main>
+      <footer><BrandMark /> <span>BarBa · Hitungnya rapi, bayarnya enak.</span></footer>
+    </div>
+  </div>;
+}

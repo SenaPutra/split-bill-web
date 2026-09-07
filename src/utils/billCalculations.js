@@ -108,4 +108,6 @@ export const calculateBillTotals = ({ items = [], people = [], assignments = {},
   };
 };
 
-export const formatCurrency = (value) => (Number(value) || 0).toFixed(2);
+export const formatCurrency = (value) => `Rp ${new Intl.NumberFormat('id-ID', {
+  maximumFractionDigits: 0
+}).format(Number(value) || 0)}`;

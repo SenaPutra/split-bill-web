@@ -1,5 +1,5 @@
-import React, { useMemo, useState } from 'react';
-import { UploadCloud } from 'lucide-react';
+import React, { useEffect, useMemo, useState } from 'react';
+import { Camera, Image, UploadCloud } from 'lucide-react';
 import { apiRequest } from '../utils/api';
 import { calculateBillTotals, formatCurrency } from '../utils/billCalculations';
 
@@ -25,6 +25,13 @@ export default function PaymentProofUploader({ bill, paymentProof, onProofUpdate
     });
     return totals.peopleTotals.find((person) => person.id === paymentProof?.person_id);
   }, [bill, paymentProof]);
+  const [previewUrl, setPreviewUrl] = useState('');
+  useEffect(() => {
+    if (!file?.type.startsWith('image/')) { setPreviewUrl(''); return undefined; }
+    const url = URL.createObjectURL(file);
+    setPreviewUrl(url);
+    return () => URL.revokeObjectURL(url);
+  }, [file]);
 
   const handleFileChange = (event) => {
     const selected = event.target.files?.[0];
@@ -97,14 +104,14 @@ export default function PaymentProofUploader({ bill, paymentProof, onProofUpdate
     <section className="flow-card proof-upload-shell">
       <div className="flow-header summary-head">
         <div>
-          <div className="section-label-bar">Participant payment</div>
+          <div className="section-label-bar">Bagian kamu</div>
           <h2>{paymentProof?.person_name}</h2>
         </div>
         <strong className="summary-total">{formatCurrency(paymentProof?.expected_amount)}</strong>
       </div>
 
       <div className="status-line">
-        Current status: <span className={`status-badge status-${paymentProof?.status}`}>{paymentProof?.status || 'pending'}</span>
+        Status: <span className={`status-badge status-${paymentProof?.status}`}>{paymentProof?.status || 'belum dibayar'}</span>
       </div>
 
       {personBreakdown?.items?.length > 0 && (
@@ -119,24 +126,25 @@ export default function PaymentProofUploader({ bill, paymentProof, onProofUpdate
       )}
 
       <form className="proof-upload-form" onSubmit={handleSubmit}>
+        <div className="proof-file-actions">
+          <label className="btn-submit"><Camera size={18} /> Ambil bukti bayar<input className="visually-hidden" type="file" accept="image/*" capture="environment" onChange={handleFileChange} /></label>
+          <label className="btn-secondary"><Image size={18} /> Pilih gambar<input className="visually-hidden" type="file" accept="image/jpeg,image/png,image/webp,application/pdf" onChange={handleFileChange} /></label>
+        </div>
+        {previewUrl && <figure className="proof-preview"><img src={previewUrl} alt="Pratinjau bukti pembayaran" /><figcaption>{file.name}</figcaption></figure>}
         <label>
-          Proof file (JPG, PNG, WEBP, PDF, max 5 MB)
-          <input type="file" accept="image/jpeg,image/png,image/webp,application/pdf" onChange={handleFileChange} />
-        </label>
-        <label>
-          Paid amount
+          Nominal yang dibayar
           <input type="number" min="0" step="0.01" value={paidAmount} onChange={(event) => setPaidAmount(event.target.value)} />
         </label>
         <label>
-          Note
-          <textarea value={note} onChange={(event) => setNote(event.target.value)} placeholder="Optional transfer note" />
+          Catatan
+          <textarea value={note} onChange={(event) => setNote(event.target.value)} placeholder="Opsional" />
         </label>
 
         {error && <div className="inline-error">{error}</div>}
         {status && <div className="success-note">{status}</div>}
 
         <button className="btn-submit" type="submit" disabled={isSubmitting}>
-          <UploadCloud size={17} /> {isSubmitting ? 'Uploading...' : 'Submit payment proof'}
+          <UploadCloud size={17} /> {isSubmitting ? 'Sedang mengunggah...' : 'Kirim bukti pembayaran'}
         </button>
       </form>
     </section>
