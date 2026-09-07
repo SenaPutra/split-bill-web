@@ -29,7 +29,7 @@ export default function ImageUploader({ onImageUpload }) {
       }
     } catch (err) {
       console.error('Camera Error:', err);
-      setCameraError('Could not access camera. Please ensure you are on HTTPS or localhost and have granted permission.');
+      setCameraError('Kamera belum bisa dibuka. Pastikan izin kamera aktif, atau pilih foto dari galeri.');
     }
   };
 
@@ -105,7 +105,7 @@ export default function ImageUploader({ onImageUpload }) {
         onImageUpload(reader.result);
       };
     } else {
-      setFileError('Please upload an image file.');
+      setFileError('Pilih file gambar struk, ya.');
     }
   };
 
@@ -140,7 +140,7 @@ export default function ImageUploader({ onImageUpload }) {
         </div>
       )}
 
-      <div className="section-label-bar">Official upload</div>
+      <div className="section-label-bar">Mulai dari struk</div>
 
       <div
         className={`upload-plate ${dragActive ? 'is-dragging' : ''}`}
@@ -161,19 +161,19 @@ export default function ImageUploader({ onImageUpload }) {
             <Upload size={40} />
           </span>
           <span>
-            <strong>Upload receipt</strong>
-            <small>Drag and drop an image, or click to browse.</small>
+            <strong>Foto struknya.</strong>
+            <small>Sisanya biar BarBa yang hitung. Tarik foto ke sini atau pilih dari galeri.</small>
           </span>
         </label>
       </div>
 
-      <div className="dotted-divider"><span>or</span></div>
+      <div className="dotted-divider"><span>atau langsung</span></div>
 
       {fileError && <div className="inline-error upload-error">{fileError}</div>}
 
       <button className="btn-secondary-wide" onClick={startCamera}>
         <Camera size={20} />
-        Open camera
+        <span>Buka kamera</span>
       </button>
     </section>
   );

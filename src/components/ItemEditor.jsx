@@ -63,11 +63,11 @@ export default function ItemEditor({
     <section className="flow-card editor-card">
       <div className="flow-header">
         <div>
-          <div className="section-label-bar">Official items</div>
-          <h2>Verify items</h2>
+          <div className="section-label-bar">Hasil pindai</div>
+          <h2>Cek pesanan</h2>
         </div>
         <button className="btn-secondary" onClick={addItem}>
-          <Plus size={16} /> Add item
+          <Plus size={16} /> Tambah item
         </button>
       </div>
 
@@ -167,9 +167,9 @@ export default function ItemEditor({
         </dl>
 
         <div className="grand-total">
-          <span>Calculated total</span>
-          <strong>{grandTotal.toFixed(2)}</strong>
-          <button className="btn-submit" onClick={onNext}>Next: assign people</button>
+          <span>Total sementara</span>
+          <strong>Rp {grandTotal.toLocaleString('id-ID')}</strong>
+          <button className="btn-submit" onClick={onNext}>Lanjut tambah teman</button>
         </div>
       </div>
     </section>

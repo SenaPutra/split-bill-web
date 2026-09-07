@@ -7,7 +7,7 @@ export default function PaymentMethodSetup({ paymentMethod, setPaymentMethod }) 
 
   return (
     <section className="payment-method-panel">
-      <div className="section-label-bar">Payment destination</div>
+      <div className="section-label-bar">Cara bayar</div>
       <div className="payment-method-grid">
         <label>
           Bank / Wallet

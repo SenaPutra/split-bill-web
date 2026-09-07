@@ -1,4 +1,5 @@
 import React from 'react';
+import { Minus, Plus } from 'lucide-react';
 
 const lineTotal = (item) => (Number(item.price) || 0) * (Number(item.quantity) || 1);
 const getQuantity = (item) => Math.max(1, Number(item.quantity) || 1);
@@ -87,9 +88,9 @@ export default function Splitter({ items, people, assignments, setAssignments, o
     <section className="flow-card splitter-card">
       <div className="flow-header">
         <div>
-          <div className="section-label-bar">Player poll</div>
-          <h2>Assign items</h2>
-          <p>Quantity 1 can be shared by several people. Quantity above 1 must match the assigned portions.</p>
+          <div className="section-label-bar">Bagikan pesanan</div>
+          <h2>Siapa makan apa?</h2>
+          <p>Ketuk plus untuk memberi porsi. Satu item tetap bisa dinikmati bareng.</p>
         </div>
         {invalidItems > 0 && <span className="status-badge is-error">{invalidItems} invalid</span>}
       </div>
@@ -138,7 +139,7 @@ export default function Splitter({ items, people, assignments, setAssignments, o
                           onClick={() => updatePortion(item, person.id, -1)}
                           aria-label={`Kurangi porsi ${person.name} untuk ${item.name}`}
                         >
-                          -
+                          <Minus size={16} />
                         </button>
                         <span>{person.name} x{portions}</span>
                         <button
@@ -146,7 +147,7 @@ export default function Splitter({ items, people, assignments, setAssignments, o
                           onClick={() => updatePortion(item, person.id, 1)}
                           aria-label={`Tambah porsi ${person.name} untuk ${item.name}`}
                         >
-                          +
+                          <Plus size={16} />
                         </button>
                         {portions > 0 && <small>{share.toFixed(2)}</small>}
                       </div>
@@ -175,7 +176,7 @@ export default function Splitter({ items, people, assignments, setAssignments, o
 
       <div className="flow-actions">
         <button className="btn-submit" onClick={onNext} disabled={!canProceed}>
-          View summary
+          Lihat hasil pembagian
         </button>
       </div>
     </section>
