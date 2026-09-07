@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { Check, CircleDollarSign, Pencil, ReceiptText, RotateCcw, ScanLine, Sparkles, Users } from 'lucide-react';
+import { Check, CircleDollarSign, Pencil, Receipt, RotateCcw, ScanLine, Sparkles, Users } from 'lucide-react';
 import ImageUploader from './components/ImageUploader';
 import ReceiptProcessor from './components/ReceiptProcessor';
 import ItemEditor from './components/ItemEditor';
@@ -12,7 +12,7 @@ import DesignPreview from './components/DesignPreview';
 import { stripBasePath, withBasePath } from './utils/basePath';
 
 const FLOW = [
-  { key: 'upload', label: 'Struk', icon: ReceiptText },
+  { key: 'upload', label: 'Struk', icon: Receipt },
   { key: 'processing', label: 'Pindai', icon: ScanLine },
   { key: 'edit', label: 'Periksa', icon: Pencil },
   { key: 'people', label: 'Teman', icon: Users },
